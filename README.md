@@ -160,24 +160,24 @@ task.watch();
 
 This term is talking about options replace rules.
 
-### Case 1 : Replace string with one marker only string.
+### Case 1 : Replace string that has one marker only.
 
 If you want to replace from string to object or array.  
 Use only one marker in target string.
 
-- target
+#### target
 ```javascript
 '{{object}}'
 ```
 
-- options
+#### options
 ```javascript
 {
 	'object' : {key:'value'}
 }
 ```
 
-- result
+#### result
 ```javascript
 {key:'value'}
 ```
@@ -187,12 +187,12 @@ Use only one marker in target string.
 If target string has multiple markers.
 Not string values are automatically replace toString() value.
 
-- target
+#### target
 ```javascript
 '{{string}} {{object}} {{array}}.'
 ```
 
-- options
+#### options
 ```javascript
 {
 	'string' : 'This is string.',
@@ -201,7 +201,7 @@ Not string values are automatically replace toString() value.
 }
 ```
 
-- result
+#### result
 ```javascript
 'This is string. [object Object] This,is,array'
 ```
@@ -210,7 +210,7 @@ Not string values are automatically replace toString() value.
 
 Options can replace markers recursivly.
 
-- target
+#### target
 ```javascript
 {
 	'obj' : {
@@ -230,7 +230,7 @@ Options can replace markers recursivly.
 }
 ```
 
-- options
+#### options
 ```javascript
 {
 	'src'  : 'path/to/js',
@@ -241,7 +241,7 @@ Options can replace markers recursivly.
 }
 ```
 
-- result
+#### result
 ```javascript
 {
 	'obj' : {
