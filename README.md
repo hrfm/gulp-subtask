@@ -1,6 +1,8 @@
 gulp-subtask
 ============
 
+---
+
 ## Getting started
 
 You can install this module from npm.
@@ -158,6 +160,108 @@ task.watch();
 
 ## <a name ="ReplaceRules">Replace Rules
 
+This term is talking about options replace rules.
+
+### Case 1 : Replace string with one marker only string.
+
+If you want to replace from string to object or array.  
+Use only one marker in target string.
+
+- target
+```javascript
+'{{object}}'
+```
+
+- options
+```javascript
+{
+	'object' : {key:'value'}
+}
+```
+
+- result
+```javascript
+{key:'value'}
+```
+
+### Case 2 : Replace string with multiple marker string.
+
+If target string has multiple markers.
+Not string values are automatically replace toString() value.
+
+- target
+```javascript
+'{{string}} {{object}} {{array}}.'
+```
+
+- options
+```javascript
+{
+	'string' : 'This is string.',
+	'object' : {'text':'This is object'},
+	'array'  : ['This','is','array']
+}
+```
+
+- result
+```javascript
+'This is string. [object Object] This,is,array'
+```
+
+### Case3 : Replace object or array recursivly
+
+Options can replace markers recursivly.
+
+- target
+```javascript
+{
+	'obj' : {
+		'arr' : [
+			'{{src}}',
+			'dest is {{dest}}'
+		],
+		'str' : 'src is {{src}}',
+		'mix' : [
+			'{{src}}',
+			[
+				'{{obj}}',
+				{'str':'{{src}}'}
+			]
+		]
+	}
+}
+```
+
+- options
+```javascript
+{
+	'src'  : 'path/to/js',
+	'dest' : 'path/to/dest',
+	'obj'  : {
+		'key' : 'value'
+	}
+}
+```
+
+- result
+```javascript
+{
+	'obj' : {
+		'arr' : [
+			'path/to/js',
+			'dest is path/to/dest'
+		],
+		'str' : 'src is path/to/js',
+		'mix' : [
+			'path/to/js',
+			[
+				{'key':'value'},
+				{'str':'path/to/js'}
+			]
+		]
+	}
+}
+```
 
 ---
 
