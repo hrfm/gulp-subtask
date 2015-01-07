@@ -39,20 +39,12 @@
     }
 
     SubTask.prototype.pipe = function(){
-      
-      if( typeof arguments[0] !== 'function' ){
-        throw 'Invalid arguments : First argument have to be a Function.';
-      }
-
       var args=[];
       for( var i=0; i<arguments.length; i++ ){
         args.push( arguments[i] );
       }
-
       this._pipes.push(args);
-      
       return this;
-
     }
 
     SubTask.prototype.clone = function(){
@@ -128,7 +120,7 @@
           }else{
             stream = stream.pipe.apply( null, args );
           }
-          
+
         }
 
       }
