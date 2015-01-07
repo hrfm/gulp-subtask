@@ -1,8 +1,6 @@
 gulp-subtask
 ============
 
----
-
 ## Getting started
 
 You can install this module from npm.
