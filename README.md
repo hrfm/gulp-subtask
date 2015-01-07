@@ -75,7 +75,7 @@ task.run({
 
 You can get 'test/dest/js/all_a.js' and 'test/dest/js/all_b.js'.
 
-Options is powerful solution for gulp tasks.  
+Options is powerful solution of gulp-subtasks.  
 You can replace all '{{key}}' markers recursivly.
 
 For example...
@@ -86,7 +86,7 @@ var tsc = new subtask('tsc')
 	.pipe( plumber )
 	.pipe( tsc, { declaration : true, out:'{{out}}' })
 	.pipe( g.dest, '{{srcDir}}' )
-	.pipe( filter, '{{filter}} )
+	.pipe( filter, '{{filter}}' )
 	.pipe( g.dest, '{{dest}}' );
 
 tsc.run({
