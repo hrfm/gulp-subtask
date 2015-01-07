@@ -8,15 +8,61 @@
 
     var g = gulpRef || gulp;
 
-    var regex = /\{\{(.+)\}\}/;
-    function replaceToOption( str, options ){
-      if( options && typeof str === 'string' && regex.test(str) ){
-        var opt = options[ regex.exec(str)[1] ];
-        if( typeof opt !== 'undefined' ){
-          return opt
-        }
+    function replaceToOption( target, options ){
+
+      var type = typeof target;
+
+      if( !options || type === 'undefined' || type === 'function' ){
+        return target;
       }
-      return str;
+
+
+      if( type === 'string' && /\{\{(\w+)\}\}/.test(target) ){
+        
+        // --- String.
+
+        var tags = target.match(/\{\{(\w+)\}\}/g);
+
+        if( tags && 0 < tags.length ){
+
+          if( tags.length == 1 && tags[0] === target ){
+
+            // If tags.length is one and target string is completely same as tags[0].
+            // Only this condition. Target can replaced with options.value. 
+
+            return options[ (/\{\{(\w+)\}\}/).exec( tags[0] )[1] ];
+
+          }else{
+
+            for( var i=0; i<tags.length; i++ ){
+              var result = /\{\{(\w+)\}\}/.exec(tags[i]);
+              target = target.replace( result[0], options[result[1]].toString() );
+            }
+
+          }
+
+        }
+
+      }else if( target instanceof Array ){
+        
+        // --- Array.
+        
+        for( var i = 0; i < target.length; i++ ){
+          target[i] = replaceToOption( target[i], options );
+        }
+
+      }else if( type === 'object' ){
+        
+        // --- Object.
+        
+        for( var key in target ){
+          target[key] = replaceToOption( target[key], options );
+        }
+
+      }
+      
+      return target;
+
     }
 
     // ==============================================================================
@@ -80,7 +126,11 @@
       
       console.log("Watching "+name);
       
-      g.watch( replaceToOption( this._src, options ), function(){ self.run(options); });
+      if( typeof options !== 'undefined' ){
+        g.watch( replaceToOption( this._src, options ), function(){ self.run(options); });
+      }else{
+        g.watch( this._src, this.run );
+      }
       
     }
 
