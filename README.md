@@ -27,8 +27,8 @@ Create task likes gulp tasks.
 ```javascript
 var task = new SubTask()
 	.src( 'test/js/*.js' )
-	.pipe( concat('all.js') )
-	.pipe( g.dest('test/dest/js') );
+	.pipe( concat, 'all.js' )
+	.pipe( g.dest, 'test/dest/js' );
 
 task.run();
 ```
@@ -41,7 +41,7 @@ You can continue task use pipe() afret run().
 ```javascript
 var task = new SubTask('task')
 	.src( 'test/js/*.js' )
-	.pipe( concat('all.js') );
+	.pipe( concat, 'all.js' );
 
 task.run()
 	.pipe( g.dest('test/dest/js') );
@@ -56,12 +56,8 @@ You can do it like below.
 ```javascript
 var task = new SubTask('task')
 	.src( 'test/js/*.js' )
-	.pipe( function(opt){
-		// opt is arguments of run.
-		// You have to return result.
-		return concat(opt.name)
-	})
-	.pipe( g.dest('test/dest/js') );
+	.pipe( concat, '{{name}}' )
+	.pipe( g.dest, 'test/dest/js' );
 
 task.run({ name : 'all_a.js' });
 task.run({ name : 'all_b.js' });
@@ -77,7 +73,7 @@ In that case. You have to make a task without src method.
 ```javascript
 var task4 = new SubTask('task4')
 	// Don't call src() method!!
-	.pipe( concat('all.js') );
+	.pipe( concat, 'all.js' );
 
 g.src( 'test/js/*.js' )
  .pipe( task4.run() )
@@ -88,9 +84,7 @@ Ofcourse you can use options during pipe.
 
 ```javascript
 var task4 = new SubTask('task4')
-	.pipe( function(opt){
-		return concat(opt.name);
-	});
+	.pipe( concat, '{{name}}' );
 
 g.src( 'test/js/*.js' )
  .pipe( task4.run({name:'all.js'}) )

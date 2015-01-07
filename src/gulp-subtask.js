@@ -8,6 +8,8 @@
 
     var g = gulpRef || gulp;
 
+    var regex = /\{\{(.+)\}\}/;
+
     // ==============================================================================
     // --- SubTask.
     // ------------------------------------------------------------------------------
@@ -27,21 +29,27 @@
       return this;
     }
 
-    SubTask.prototype.pipe = function( obj ){
-      this._pipes.push( obj );
+    SubTask.prototype.pipe = function(){
+      
+      if( typeof arguments[0] !== 'function' ){
+        throw 'Invalid arguments : First argument have to be a function.';
+      }
+
+      var args=[];
+      for( var i=0; i<arguments.length; i++ ){
+        args.push( arguments[i] );
+      }
+
+      this._pipes.push(args);
+      
       return this;
+
     }
 
     SubTask.prototype.clone = function(){
       var clone = new SubTask( this._name );
-      if( typeof this._src !== 'undefined' ){
-        clone.src( this._src );
-      }
-      if( this._pipes && 0 < this._pipes.length ){
-        for( var i = 0, len = this._pipes.length; i < len; i++ ){
-          clone.pipe( this._pipes[i] );
-        }
-      }
+      clone._src   = this._src;
+      clone._pipes = this._pipes;
       return clone;
     }
 
@@ -75,12 +83,26 @@
 
       stream = g.src( src || this._src );
 
-      for( var i=0, len=this._pipes.length; i < len; i++ ){
-        var p = this._pipes[i];
-        if( typeof p === 'function' ){
-          stream = stream.pipe( p( options ) );
-        }else{
-          stream = stream.pipe( p );
+      if( typeof options === 'undefined' ){
+        for( var i=0, len=this._pipes.length; i < len; i++ ){
+          var args = this._pipes[i];
+          stream = stream.pipe( args.shift().apply( null, args ) );
+        }
+      }else{
+        for( var i=0, len=this._pipes.length; i < len; i++ ){
+          var args = this._pipes[i];
+          var applyArgs = [];
+          for( var j=1; j<args.length; j++ ){
+            if( typeof args[j] === 'string' && regex.test(args[j]) ){
+              var opt = options[ regex.exec(args[j])[1] ];
+              if( typeof opt !== 'undefined' ){
+                applyArgs.push(opt);
+                continue;
+              }
+            }
+            applyArgs.push(args[j]);
+          }
+          stream = stream.pipe( args[0].apply( null, applyArgs ) );
         }
       }
 
@@ -109,7 +131,8 @@
         function( callback ){
           var that=this;
           self.clone()
-            .pipe(th2.obj(
+            .pipe(
+              th2.obj,
               function(f,enc,cb){
                 if(f.isNull()  ){ return cb(); }
                 if(f.isStream()){ return this.emit('error',new PluginError('gulp-subtask','Streaming not supported')); }
@@ -120,7 +143,7 @@
                 cb();
                 this.emit('end');
               }
-            ))
+            )
             ._run( options, src );
         }
       );
