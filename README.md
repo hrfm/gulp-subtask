@@ -55,12 +55,18 @@ You can do it like below.
 
 ```javascript
 var task = new SubTask('task')
-	.src( 'test/js/*.js' )
-	.pipe( concat, '{{name}}' )
+	.src( '{{src}}' )
+	.pipe( concat, '{{concat}}' )
 	.pipe( g.dest, 'test/dest/js' );
 
-task.run({ name : 'all_a.js' });
-task.run({ name : 'all_b.js' });
+task.run({
+	src    : 'test/js/*.js',
+	concat : 'ab.case3a.js'
+});
+task.run({
+	src    : 'test/js/*.js',
+	concat : 'ab.case3b.js'
+});
 ```
 
 You can get 'test/dest/js/all_a.js' and 'test/dest/js/all_b.js'.
@@ -71,23 +77,23 @@ gulp-subtask is be able to using between gulp pipes.
 In that case. You have to make a task without src method.
 
 ```javascript
-var task4 = new SubTask('task4')
+var task = new SubTask('task')
 	// Don't call src() method!!
 	.pipe( concat, 'all.js' );
 
 g.src( 'test/js/*.js' )
- .pipe( task4.run() )
+ .pipe( task.run() )
  .pipe( g.dest('test/dest/js') );
 ```
 
 Ofcourse you can use options during pipe.
 
 ```javascript
-var task4 = new SubTask('task4')
+var task = new SubTask('task')
 	.pipe( concat, '{{name}}' );
 
 g.src( 'test/js/*.js' )
- .pipe( task4.run({name:'all.js'}) )
+ .pipe( task.run({name:'all.js'}) )
  .pipe( g.dest('test/dest/js') );
 ```
 

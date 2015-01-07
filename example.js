@@ -24,12 +24,18 @@ task2.run()
 // Case3 : Task with options.
 
 var task3 = new SubTask('task3')
-	.src( 'test/js/*.js' )
-	.pipe( concat, '{{name}}' )
+	.src( '{{src}}' )
+	.pipe( concat, '{{concat}}' )
 	.pipe( g.dest, 'test/dest/js' );
 
-task3.run({ name : 'ab.case3a.js' });
-task3.run({ name : 'ab.case3b.js' });
+task3.run({
+	src    : 'test/js/*.js',
+	concat : 'ab.case3a.js'
+});
+task3.run({
+	src    : 'test/js/*.js',
+	concat : 'ab.case3b.js'
+});
 
 // Case4 : Using between pipes
 

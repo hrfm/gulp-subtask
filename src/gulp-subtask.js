@@ -9,6 +9,15 @@
     var g = gulpRef || gulp;
 
     var regex = /\{\{(.+)\}\}/;
+    function replaceToOption( str, options ){
+      if( options && typeof str === 'string' && regex.test(str) ){
+        var opt = options[ regex.exec(str)[1] ];
+        if( typeof opt !== 'undefined' ){
+          return opt
+        }
+      }
+      return str;
+    }
 
     // ==============================================================================
     // --- SubTask.
@@ -24,7 +33,7 @@
     // public:
 
     SubTask.prototype.src = function( src ){
-      this._src   = src
+      this._src   = src;
       this._pipes = [];
       return this;
     }
@@ -81,6 +90,7 @@
       
     }
 
+
     // ------------------------------------------------------------------------------
     // private:
 
@@ -94,26 +104,19 @@
 
       // --- Run task.
 
-      stream = g.src( src || this._src );
+      stream = g.src( replaceToOption( src || this._src, options ) );
 
       if( typeof options === 'undefined' ){
         for( var i=0, len=this._pipes.length; i < len; i++ ){
           var args = this._pipes[i];
-          stream = stream.pipe( args.shift().apply( null, args ) );
+          stream = stream.pipe( args[0].apply( null, args.slice(1,args.length) ) );
         }
       }else{
         for( var i=0, len=this._pipes.length; i < len; i++ ){
           var args = this._pipes[i];
           var applyArgs = [];
           for( var j=1; j<args.length; j++ ){
-            if( typeof args[j] === 'string' && regex.test(args[j]) ){
-              var opt = options[ regex.exec(args[j])[1] ];
-              if( typeof opt !== 'undefined' ){
-                applyArgs.push(opt);
-                continue;
-              }
-            }
-            applyArgs.push(args[j]);
+            applyArgs.push( replaceToOption( args[j], options ) );
           }
           stream = stream.pipe( args[0].apply( null, applyArgs ) );
         }
