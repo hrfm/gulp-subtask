@@ -63,11 +63,6 @@
     }
 
     SubTask.prototype.run = function( options ){
-
-      if( options && typeof options !== 'object' ){
-        throw "Invalid arguments : Options have to be a Object."
-      }
-
       if( typeof this._src === 'undefined' ){
         return this._pipe( options );
       }else{
@@ -107,19 +102,35 @@
       stream = g.src( replaceToOption( src || this._src, options ) );
 
       if( typeof options === 'undefined' ){
+        
         for( var i=0, len=this._pipes.length; i < len; i++ ){
+          
           var args = this._pipes[i];
-          stream = stream.pipe( args[0].apply( null, args.slice(1,args.length) ) );
-        }
-      }else{
-        for( var i=0, len=this._pipes.length; i < len; i++ ){
-          var args = this._pipes[i];
-          var applyArgs = [];
-          for( var j=1; j<args.length; j++ ){
-            applyArgs.push( replaceToOption( args[j], options ) );
+          if( typeof args[0] === 'function' ){
+            stream = stream.pipe( args[0].apply( null, args.slice(1,args.length) ) );
+          }else{
+            stream = stream.pipe.apply( null, args );
           }
-          stream = stream.pipe( args[0].apply( null, applyArgs ) );
+
         }
+
+      }else{
+
+        for( var i=0, len=this._pipes.length; i < len; i++ ){
+
+          var args = this._pipes[i];
+          if( typeof args[0] === 'function' ){
+            var applyArgs = [];
+            for( var j=1; j<args.length; j++ ){
+              applyArgs.push( replaceToOption( args[j], options ) );
+            }
+            stream = stream.pipe( args[0].apply( null, applyArgs ) );
+          }else{
+            stream = stream.pipe.apply( null, args );
+          }
+          
+        }
+
       }
 
       stream.on( 'end', function(){
