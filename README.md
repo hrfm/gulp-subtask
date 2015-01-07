@@ -6,7 +6,7 @@ gulp-subtask
 You can install this module from npm.
 
 ```sh
-npm install gulp-carryout
+npm install gulp-subtask
 ```
 
 ## Usage
