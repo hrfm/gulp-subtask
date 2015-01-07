@@ -101,7 +101,7 @@
           if( typeof args[0] === 'function' ){
             stream = stream.pipe( args[0].apply( null, args.slice(1,args.length) ) );
           }else{
-            stream = stream.pipe.apply( null, args );
+            stream = stream.pipe.apply( stream, args );
           }
 
         }
@@ -110,15 +110,19 @@
 
         for( var i=0, len=this._pipes.length; i < len; i++ ){
 
-          var args = this._pipes[i];
+          var args = this._pipes[i], applyArgs = [];
+
           if( typeof args[0] === 'function' ){
-            var applyArgs = [];
             for( var j=1; j<args.length; j++ ){
               applyArgs.push( replaceToOption( args[j], options ) );
             }
             stream = stream.pipe( args[0].apply( null, applyArgs ) );
           }else{
-            stream = stream.pipe.apply( null, args );
+            for( var j=0; j<args.length; j++ ){
+              applyArgs.push( replaceToOption( args[j], options ) );
+            }
+            console.log(applyArgs);
+            stream = stream.pipe.apply( stream, applyArgs );
           }
 
         }
