@@ -121,7 +121,6 @@
             for( var j=0; j<args.length; j++ ){
               applyArgs.push( replaceToOption( args[j], options ) );
             }
-            console.log(applyArgs);
             stream = stream.pipe.apply( stream, applyArgs );
           }
 
