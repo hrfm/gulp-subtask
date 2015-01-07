@@ -50,7 +50,9 @@ task.run()
 ### Case3 : Run with options.
 
 gulp-subtask is able to run with using option.
-For example. If you want to change concat() output filename flexibly.
+
+For example. If you want to change flexibly input src, concat output, and more.
+
 You can do it like below.
 
 ```javascript
@@ -61,11 +63,11 @@ var task = new SubTask('task')
 
 task.run({
 	src    : 'test/js/*.js',
-	concat : 'ab.case3a.js'
+	concat : 'all_a.js'
 });
 task.run({
 	src    : 'test/js/*.js',
-	concat : 'ab.case3b.js'
+	concat : 'all_a.js'
 });
 ```
 
