@@ -47,7 +47,7 @@ task.run()
 	.pipe( g.dest('test/dest/js') );
 ```
 
-### Case3 : Task with options.
+### Case3 : Run with options.
 
 gulp-subtask is able to run with using option.
 For example. If you want to change concat() output filename flexibly.
