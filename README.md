@@ -9,6 +9,8 @@ You can install this module from npm.
 npm install gulp-subtask
 ```
 
+---
+
 ## Usage
 
 ### At first.
@@ -51,7 +53,7 @@ task.run()
 
 gulp-subtask is able to run with using option.
 
-For example. If you want to change flexibly input src, concat output, and more.
+For example. If you want to change flexibly input src, output, and more.
 
 You can do it like below.
 
@@ -72,6 +74,45 @@ task.run({
 ```
 
 You can get 'test/dest/js/all_a.js' and 'test/dest/js/all_b.js'.
+
+Options is powerful solution for gulp tasks.  
+You can replace all '{{key}}' markers recursivly.
+
+For example...
+
+```javascript
+var tsc = new subtask('tsc')
+	.src(['{{srcDir}}/*.ts','!**/*.d.ts'])
+	.pipe( plumber )
+	.pipe( tsc, { declaration : true, out:'{{out}}' })
+	.pipe( g.dest, '{{srcDir}}' )
+	.pipe( filter, '{{filter}} )
+	.pipe( g.dest, '{{dest}}' );
+
+tsc.run({
+	'srcDir' : 'path/to/ts',
+	'out'    : 'output.js',
+	'filter' : ['*','!*.d.ts'],
+	'dest'   : 'path/to/dest/js'
+});
+```
+
+This code is same as below.
+
+```javascript
+var tsc = new subtask('tsc')
+	.src(['path/to/ts/*.ts','!**/*.d.ts'])
+	.pipe( plumber )
+	.pipe( tsc, { declaration : true, out:'output.js' })
+	.pipe( g.dest, 'path/to/ts' )
+	.pipe( filter, ['*','!*.d.ts'] )
+	.pipe( g.dest, 'path/to/dest/js' );
+
+tsc.run();
+```
+
+If you would like to know replace rules.  
+Check out the [Replace Rules](#ReplaceRules) term.
 
 ### Case4 : Using between gulp pipes.
 
@@ -113,6 +154,12 @@ var task = new SubTask()
 task.watch();
 ```
 
+---
+
+## <a name ="ReplaceRules">Replace Rules
+
+
+---
 
 ## API
 
