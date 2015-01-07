@@ -1,0 +1,32 @@
+{
+  "name": "gulp-subtask",
+  "version": "0.0.1",
+  "description": "Create sub task for gulp.",
+  "main": "./index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/hrfm/gulp-subtask.git"
+  },
+  "keywords": [
+    "gulp",
+    "task"
+  ],
+  "author": "hrfm <hrfm0818@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hrfm/gulp-subtask/issues"
+  },
+  "homepage": "https://github.com/hrfm/gulp-subtask",
+  "devDependencies": {
+    "gulp-concat": "^2.4.3",
+    "gulp-uglify": "^1.0.2"
+  },
+  "dependencies": {
+    "gulp": "^3.8.10",
+    "through2": "^0.6.3",
+    "gulp-util": "^3.0.1"
+  }
+}
