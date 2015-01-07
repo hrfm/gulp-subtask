@@ -86,7 +86,7 @@
       
       console.log("Watching "+name);
       
-      g.watch( this._src, function(){ self.run(options); });
+      g.watch( replaceToOption( this._src ), function(){ self.run(options); });
       
     }
 
