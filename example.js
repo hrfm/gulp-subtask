@@ -39,3 +39,12 @@ var task4 = new SubTask('task4')
 g.src( 'test/js/*.js' )
  .pipe( task4.run() )
  .pipe( g.dest('test/dest/js') );
+
+// Case5 : Watch.
+
+var task5 = new SubTask('task5')
+	.src( 'test/js/*.js' )
+	.pipe( concat, 'ab.case5.js' )
+	.pipe( g.dest, 'test/dest/js' );
+
+task5.watch();

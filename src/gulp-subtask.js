@@ -32,7 +32,7 @@
     SubTask.prototype.pipe = function(){
       
       if( typeof arguments[0] !== 'function' ){
-        throw 'Invalid arguments : First argument have to be a function.';
+        throw 'Invalid arguments : First argument have to be a Function.';
       }
 
       var args=[];
@@ -54,6 +54,11 @@
     }
 
     SubTask.prototype.run = function( options ){
+
+      if( options && typeof options !== 'object' ){
+        throw "Invalid arguments : Options have to be a Object."
+      }
+
       if( typeof this._src === 'undefined' ){
         return this._pipe( options );
       }else{
@@ -61,11 +66,19 @@
       }
     }
 
-    SubTask.prototype.watch = function(){
+    SubTask.prototype.watch = function( options ){
+      
       if( typeof this._src === 'undefined' ){
         throw 'watch src undefined.';
       }
-      _gulp.watch( this._src, this._run );
+      
+      var self = this;
+      var name = "sub task" + ( (typeof this._name==='string') ? " '"+this._name+"'" : "" );
+      
+      console.log("Watching "+name);
+      
+      g.watch( this._src, function(){ self.run(options); });
+      
     }
 
     // ------------------------------------------------------------------------------

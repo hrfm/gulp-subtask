@@ -91,9 +91,85 @@ g.src( 'test/js/*.js' )
  .pipe( g.dest('test/dest/js') );
 ```
 
+### Case5 : Watch the task.
+
+If you want to watch subTask.src and run.
+Simply call watch.
+
+```javascript
+var task = new SubTask()
+	.src( 'test/js/*.js' )
+	.pipe( concat, 'all.js' )
+	.pipe( g.dest, 'test/dest/js' );
+
+task.watch();
+```
+
+
 ## API
 
-Under construction...
+### SubTask.src( src );
+
+example
+
+```javescript
+task.src(['path/to/js/*.js','!**/*.map'])
+```
+
+#### src
+Type: `String` or `Array`
+
+### SubTask.pipe( fnc, ...args );
+
+example
+
+```javescript
+task.pipe( concat, 'all.js' );
+```
+```javescript
+task.pipe( someTask, arg1, arg2, arg3 );
+```
+
+#### fnc
+Type: `Function`
+
+What plugins want to use.
+Don't call. Set function's reference only.
+
+#### ...args
+Type: `Any`
+
+### SubTask.run( options );
+
+example
+
+```javescript
+task.run();
+```
+```javescript
+task.run({name:'test.js'});
+```
+
+#### options
+Type: `Object`
+
+Key-Value Object.
+
+### SubTask.watch( options );
+
+example
+
+```javescript
+task.watch();
+```
+```javescript
+task.watch({name:'test.js'});
+```
+
+#### options
+Type: `Object`
+
+Key-Value Object.
 
 ---
 

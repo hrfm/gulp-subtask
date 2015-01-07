@@ -1,1 +1,1 @@
-var b = 'hoge';
+var b = 'piyo';
