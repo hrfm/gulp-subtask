@@ -1,6 +1,6 @@
 {
   "name": "gulp-subtask",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Create sub task for gulp.",
   "main": "./index.js",
   "scripts": {
@@ -12,7 +12,8 @@
   },
   "keywords": [
     "gulp",
-    "task"
+    "task",
+    "gulpplugin"
   ],
   "author": "hrfm <hrfm0818@gmail.com>",
   "license": "MIT",
