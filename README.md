@@ -160,7 +160,7 @@ task.watch();
 
 This term is talking about options replace rules.
 
-### Case 1 : Replace string that has one marker only.
+### Case 1 : Replace string to any types.
 
 If you want to replace from string to object or array.  
 Use only one marker in target string.
@@ -182,9 +182,9 @@ Use only one marker in target string.
 {key:'value'}
 ```
 
-### Case 2 : Replace string with multiple marker string.
+### <a name='Case2'>Case 2 : Replace string with multiple marker string.
 
-If target string has multiple markers.
+If target string has charactor other than marker or multiple markers.
 Not string values are automatically replace toString() value.
 
 #### target
@@ -206,9 +206,9 @@ Not string values are automatically replace toString() value.
 'This is string. [object Object] This,is,array'
 ```
 
-### Case3 : Replace object or array recursivly
+### Case3 : Replace makers in object or array
 
-Options can replace markers recursivly.
+Options can replace markers in object or array recursivly.
 
 #### target
 ```javascript
