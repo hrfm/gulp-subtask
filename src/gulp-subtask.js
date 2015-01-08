@@ -7,63 +7,7 @@
   module.exports = function( gulpRef ){
 
     var g = gulpRef || gulp;
-
-    function replaceToOption( target, options ){
-
-      var type = typeof target;
-
-      if( !options || type === 'undefined' || type === 'function' ){
-        return target;
-      }
-
-
-      if( type === 'string' && /\{\{(\w+)\}\}/.test(target) ){
-        
-        // --- String.
-
-        var tags = target.match(/\{\{(\w+)\}\}/g);
-
-        if( tags && 0 < tags.length ){
-
-          if( tags.length == 1 && tags[0] === target ){
-
-            // If tags.length is one and target string is completely same as tags[0].
-            // Only this condition. Target can replaced with options.value. 
-
-            return options[ (/\{\{(\w+)\}\}/).exec( tags[0] )[1] ];
-
-          }else{
-
-            for( var i=0; i<tags.length; i++ ){
-              var result = /\{\{(\w+)\}\}/.exec(tags[i]);
-              target = target.replace( result[0], options[result[1]].toString() );
-            }
-
-          }
-
-        }
-
-      }else if( target instanceof Array ){
-        
-        // --- Array.
-        
-        for( var i = 0; i < target.length; i++ ){
-          target[i] = replaceToOption( target[i], options );
-        }
-
-      }else if( type === 'object' ){
-        
-        // --- Object.
-        
-        for( var key in target ){
-          target[key] = replaceToOption( target[key], options );
-        }
-
-      }
-      
-      return target;
-
-    }
+    var inject = require('./inject.js');
 
     // ==============================================================================
     // --- SubTask.
@@ -127,7 +71,7 @@
       console.log("Watching "+name);
       
       if( typeof options !== 'undefined' ){
-        g.watch( replaceToOption( this._src, options ), function(){ self.run(options); });
+        g.watch( inject( this._src, options ), function(){ self.run(options); });
       }else{
         g.watch( this._src, this.run );
       }
@@ -148,7 +92,7 @@
 
       // --- Run task.
 
-      stream = g.src( replaceToOption( src || this._src, options ) );
+      stream = g.src( inject( src || this._src, options ) );
 
       if( typeof options === 'undefined' ){
         
@@ -171,12 +115,12 @@
 
           if( typeof args[0] === 'function' ){
             for( var j=1; j<args.length; j++ ){
-              applyArgs.push( replaceToOption( args[j], options ) );
+              applyArgs.push( inject( args[j], options ) );
             }
             stream = stream.pipe( args[0].apply( null, applyArgs ) );
           }else{
             for( var j=0; j<args.length; j++ ){
-              applyArgs.push( replaceToOption( args[j], options ) );
+              applyArgs.push( inject( args[j], options ) );
             }
             stream = stream.pipe.apply( stream, applyArgs );
           }
