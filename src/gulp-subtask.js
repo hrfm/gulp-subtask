@@ -30,9 +30,9 @@
 
     SubTask.prototype.pipe = function(){
       
-      //if( typeof arguments[0] !== 'function' ){
-      //  throw 'Invalid arguments : First argument have to be a Function.';
-      //}
+      if( typeof arguments[0] !== 'function' ){
+        throw 'Invalid arguments : First argument have to be a Function.';
+      }
 
       var args=[];
       for( var i=0; i<arguments.length; i++ ){
@@ -99,11 +99,11 @@
         for( var i=0, len=this._pipes.length; i < len; i++ ){
           
           var args = this._pipes[i];
-          if( typeof args[0] === 'function' ){
+          //if( typeof args[0] === 'function' ){
             stream = stream.pipe( args[0].apply( null, args.slice(1,args.length) ) );
-          }else{
-            stream = stream.pipe.apply( stream, args );
-          }
+          //}else{
+          //  stream = stream.pipe.apply( stream, args );
+          //}
 
         }
 
@@ -113,17 +113,17 @@
 
           var args = this._pipes[i], applyArgs = [];
 
-          if( typeof args[0] === 'function' ){
+          //if( typeof args[0] === 'function' ){
             for( var j=1; j<args.length; j++ ){
               applyArgs.push( inject( args[j], options ) );
             }
             stream = stream.pipe( args[0].apply( null, applyArgs ) );
-          }else{
-            for( var j=0; j<args.length; j++ ){
-              applyArgs.push( inject( args[j], options ) );
-            }
-            stream = stream.pipe.apply( stream, applyArgs );
-          }
+          //}else{
+          //  for( var j=0; j<args.length; j++ ){
+          //    applyArgs.push( inject( args[j], options ) );
+          //  }
+          //  stream = stream.pipe.apply( stream, applyArgs );
+          //}
 
         }
 
