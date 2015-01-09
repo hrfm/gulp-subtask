@@ -154,6 +154,27 @@ var task = new SubTask()
 task.watch();
 ```
 
+Ofcourse you can use options with watch method.
+
+```javascript
+task.watch( options );
+```
+
+If you watch with another src.  
+Call watchWith method.
+
+```javascript
+task.watchWith( 'another/path/to/*js', options );
+```
+
+If you watch as another src.  
+Call watchAs method.
+
+```javascript
+task.watchAs( 'another/path/to/*js', options );
+```
+
+
 ---
 
 ## <a name ="ReplaceRules">Replace Rules

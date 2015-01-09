@@ -60,8 +60,36 @@
     }
 
     SubTask.prototype.watch = function( options ){
-      
-      if( typeof this._src === 'undefined' ){
+      this._watch( this._src, options );
+    }
+
+    SubTask.prototype.watchWith = function( src, options ){
+      if( this._src instanceof Array ){
+        if( src instanceof Array ){
+          this._watch( src.concat(this._src), options );
+        }else if( typeof src === 'string' ){
+          this._watch( [src].concat(this._src), options );
+        }
+      }else if( typeof this._src === 'string' ){
+        if( src instanceof Array ){
+          src.push( this._src );
+          this._watch( src, options );
+        }else if( typeof src === 'string' ){
+          this._watch( [this._src,src], options );
+        }
+      }
+    }
+
+    SubTask.prototype.watchAs = function( src, options ){
+      this._watch( src, options );
+    }
+
+    // ------------------------------------------------------------------------------
+    // private:
+
+    SubTask.prototype._watch = function( src, options ){
+
+      if( typeof src === 'undefined' ){
         throw 'watch src undefined.';
       }
       
@@ -69,18 +97,14 @@
       var name = "sub task" + ( (typeof this._name==='string') ? " '"+this._name+"'" : "" );
       
       console.log("Watching "+name);
-      
+
       if( typeof options !== 'undefined' ){
-        g.watch( inject( this._src, options ), function(){ self.run(options); });
-      }else{
-        g.watch( this._src, this.run );
+        src = inject( src, options );
       }
       
+      g.watch( src, function(){ self.run(); });
+
     }
-
-
-    // ------------------------------------------------------------------------------
-    // private:
 
     SubTask.prototype._run = function( options, src ){
 
