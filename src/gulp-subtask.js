@@ -102,7 +102,7 @@
         src = inject( src, options );
       }
       
-      g.watch( src, function(){ self.run(); });
+      g.watch( src, function(){ self.run(options); });
 
     }
 
