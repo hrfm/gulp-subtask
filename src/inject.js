@@ -60,6 +60,10 @@
         obj[key] = arguments.callee( target[key], src );
       }
 
+    }else{
+      
+      obj = target;
+      
     }
     
     return obj;
