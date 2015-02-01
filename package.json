@@ -1,6 +1,6 @@
 {
   "name": "gulp-subtask",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Create sub task for gulp.",
   "main": "./index.js",
   "scripts": {
@@ -23,6 +23,7 @@
   "homepage": "https://github.com/hrfm/gulp-subtask",
   "devDependencies": {
     "gulp-concat": "^2.4.3",
+    "gulp-debug": "^2.0.0",
     "gulp-uglify": "^1.0.2"
   },
   "dependencies": {
