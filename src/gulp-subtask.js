@@ -106,7 +106,7 @@
 
     }
 
-    SubTask.prototype._run = function( options, src ){
+    SubTask.prototype._run = function( options, src, srcOptions ){
 
       var name = "sub task" + ( (typeof this._name==='string') ? " '"+this._name+"'" : "" ),
           time = new Date().getTime(),
@@ -116,7 +116,7 @@
 
       // --- Run task.
 
-      stream = g.src( inject( src || this._src, options ) );
+      stream = g.src( inject( src || this._src, options ), srcOptions );
 
       if( typeof options === 'undefined' ){
         
@@ -164,14 +164,25 @@
 
     }
 
+
+    /**
+     * Using subtask during pipes.
+     * 
+     */
     SubTask.prototype._pipe = function( options ){
 
-      var src=[], self=this;
+      var src=[], self=this, srcOptions;
 
       return th2.obj(
         function( f, enc, callback ){
           if(f.isNull()  ){ return callback(); }
           if(f.isStream()){ return this.emit('error',new PluginError('gulp-subtask','Streaming not supported')); }
+          if( typeof srcOptions === "undefined" ){
+            srcOptions = {
+              "cwd"  : f.cwd,
+              "base" : f.base
+            }
+          }
           src.push(f.path);
           callback();
         },
@@ -191,7 +202,7 @@
                 this.emit('end');
               }
             )
-            ._run( options, src );
+            ._run( options, src, srcOptions );
         }
       );
       
