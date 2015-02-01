@@ -2,7 +2,8 @@
 
   "use strict;"
 
-  var gulp=require('gulp'), th2=require('through2');
+  var gulp = require('gulp'),
+      th2  = require('through2');
 
   module.exports = function( gulpRef ){
 
@@ -106,7 +107,7 @@
 
     }
 
-    SubTask.prototype._run = function( options, src, srcOptions ){
+    SubTask.prototype._run = function( options, src, stream ){
 
       var name = "sub task" + ( (typeof this._name==='string') ? " '"+this._name+"'" : "" ),
           time = new Date().getTime(),
@@ -116,7 +117,9 @@
 
       // --- Run task.
 
-      stream = g.src( inject( src || this._src, options ), srcOptions );
+      if( typeof stream === "undefined" ){
+        stream = g.src( inject( src || this._src, options ) );
+      }
 
       if( typeof options === 'undefined' ){
         
@@ -164,48 +167,25 @@
 
     }
 
-
     /**
      * Using subtask during pipes.
      * 
      */
     SubTask.prototype._pipe = function( options ){
 
-      var src=[], self=this, srcOptions;
-
-      return th2.obj(
+      var obj = th2.obj(
+        // --- Get src from recent pipe.
         function( f, enc, callback ){
           if(f.isNull()  ){ return callback(); }
           if(f.isStream()){ return this.emit('error',new PluginError('gulp-subtask','Streaming not supported')); }
-          if( typeof srcOptions === "undefined" ){
-            srcOptions = {
-              "cwd"  : f.cwd,
-              "base" : f.base
-            }
-          }
-          src.push(f.path);
+          this.push(f);
           callback();
-        },
-        function( callback ){
-          var that=this;
-          self.clone()
-            .pipe(
-              th2.obj,
-              function(f,enc,cb){
-                if(f.isNull()  ){ return cb(); }
-                if(f.isStream()){ return this.emit('error',new PluginError('gulp-subtask','Streaming not supported')); }
-                that.push(f);
-                cb();
-              },
-              function(cb){
-                cb();
-                this.emit('end');
-              }
-            )
-            ._run( options, src, srcOptions );
         }
       );
       
+      return this.clone()
+          ._run( options, null, obj );
+            
     }
 
     return SubTask;
