@@ -8,6 +8,9 @@ var uglify  = require('gulp-uglify');
 var task1 = new SubTask('task1')
 	.src( 'test/js/*.js' )
 	.pipe( concat, 'ab.case1.js' )
+	.on( 'end',function(){
+		console.log('end task1 concat');
+	})
 	.pipe( g.dest, 'test/dest/js' );
 
 task1.run();
@@ -26,6 +29,9 @@ task2.run()
 var task3 = new SubTask('task3')
 	.src( '{{src}}' )
 	.pipe( concat, '{{concat}}' )
+	.on( 'end',function(){
+		console.log('end task3 concat');
+	})
 	.pipe( g.dest, 'test/dest/js' );
 
 task3.run({
@@ -51,6 +57,15 @@ g.src( 'test/js/*.js' )
 var task5 = new SubTask('task5')
 	.src( 'test/js/*.js' )
 	.pipe( concat, 'ab.case5.js' )
-	.pipe( g.dest, 'test/dest/js' );
+	.on( 'end',function(){
+		console.log('end task5 concat');
+	})
+	.on( 'end',function(){
+		console.log('end task5 concat end');
+	})
+	.pipe( g.dest, 'test/dest/js' )
+	.on( 'end',function(){
+		console.log('end task5 dest');
+	})
 
 task5.watch();

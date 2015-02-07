@@ -2,8 +2,18 @@
 
   "use strict;"
 
-  var gulp = require('gulp'),
-      th2  = require('through2');
+  var gulp  = require('gulp'),
+      th2   = require('through2');
+
+  var gutil   = require('gulp-util'),
+      cyan    = gutil.colors.cyan,
+      magenta = gutil.colors.magenta;
+
+  // ------- LOGGER -----------------------------------------------------------------
+
+  var PLUGIN_NAME = "gulp-subtask";
+
+  // ------- EXPORTS ----------------------------------------------------------------
 
   module.exports = function( gulpRef ){
 
@@ -18,6 +28,7 @@
       this._name  = taskName;
       this._src   = undefined;
       this._pipes = [];
+      this._on    = {};
     }
 
     // ------------------------------------------------------------------------------
@@ -32,17 +43,29 @@
     SubTask.prototype.pipe = function(){
       
       if( typeof arguments[0] !== 'function' ){
-        throw 'Invalid arguments : First argument have to be a Function.';
+        return new gutil.PluginError( PLUGIN_NAME, 'Invalid arguments : First argument have to be a Function.' );
       }
 
       var args=[];
       for( var i=0; i<arguments.length; i++ ){
         args.push( arguments[i] );
       }
-      this._pipes.push(args);
+      this._pipes.push({
+        'target' : 'pipe',
+        'args'   : args
+      });
       
       return this;
 
+    }
+
+    SubTask.prototype.on = function( type, callback ){
+      this._pipes.push({
+        'target'   : 'on',
+        'type'     : type,
+        'callback' : callback
+      });
+      return this;
     }
 
     SubTask.prototype.clone = function(){
@@ -95,9 +118,13 @@
       }
       
       var self = this;
-      var name = "sub task" + ( (typeof this._name==='string') ? " '"+this._name+"'" : "" );
+      var name = (typeof this._name==='string') ? this._name : "";
       
-      console.log("Watching "+name);
+      if( name == "" ){
+        gutil.log("Watching subtask");
+      }else{
+        gutil.log("Watching subtask '" + cyan(name) + "'");
+      }
 
       if( typeof options !== 'undefined' ){
         src = inject( src, options );
@@ -109,11 +136,15 @@
 
     SubTask.prototype._run = function( options, src, stream ){
 
-      var name = "sub task" + ( (typeof this._name==='string') ? " '"+this._name+"'" : "" ),
+      var name = (typeof this._name==='string') ? this._name : "",
           time = new Date().getTime(),
           stream;
 
-      console.log("Starting "+name);
+      if( name == "" ){
+        gutil.log("Starting subtask");
+      }else{
+        gutil.log("Starting subtask '" + cyan(name) + "'");
+      }
 
       // --- Run task.
 
@@ -125,12 +156,16 @@
         
         for( var i=0, len=this._pipes.length; i < len; i++ ){
           
-          var args = this._pipes[i];
-          //if( typeof args[0] === 'function' ){
-            stream = stream.pipe( args[0].apply( null, args.slice(1,args.length) ) );
-          //}else{
-          //  stream = stream.pipe.apply( stream, args );
-          //}
+          if( this._pipes[i].target == 'pipe' ){
+            var args = this._pipes[i].args;
+            //if( typeof args[0] === 'function' ){
+              stream = stream.pipe( args[0].apply( null, args.slice(1,args.length) ) );
+            //}else{
+            //  stream = stream.pipe.apply( stream, args );
+            //}
+          }else if( this._pipes[i].target == 'on' ){
+            stream = stream.on( this._pipes[i].type, this._pipes[i].callback );
+          }
 
         }
 
@@ -138,27 +173,37 @@
 
         for( var i=0, len=this._pipes.length; i < len; i++ ){
 
-          var args = this._pipes[i], applyArgs = [];
+          if( this._pipes[i].target == 'pipe' ){
 
-          //if( typeof args[0] === 'function' ){
-            for( var j=1; j<args.length; j++ ){
-              applyArgs.push( inject( args[j], options ) );
-            }
-            stream = stream.pipe( args[0].apply( null, applyArgs ) );
-          //}else{
-          //  for( var j=0; j<args.length; j++ ){
-          //    applyArgs.push( inject( args[j], options ) );
-          //  }
-          //  stream = stream.pipe.apply( stream, applyArgs );
-          //}
+            var args = this._pipes[i].args, applyArgs = [];
+
+            //if( typeof args[0] === 'function' ){
+              for( var j=1; j<args.length; j++ ){
+                applyArgs.push( inject( args[j], options ) );
+              }
+              stream = stream.pipe( args[0].apply( null, applyArgs ) );
+            //}else{
+            //  for( var j=0; j<args.length; j++ ){
+            //    applyArgs.push( inject( args[j], options ) );
+            //  }
+            //  stream = stream.pipe.apply( stream, applyArgs );
+            //}
+
+          }else if( this._pipes[i].target == 'on' ){
+            stream = stream.on( this._pipes[i].type, this._pipes[i].callback );
+          }
 
         }
 
       }
 
       stream.on( 'end', function(){
-        var elapsed = new Date().getTime() - time;
-        console.log("Finished " + name + " after " + elapsed + " ms");
+        var elapsed = (new Date().getTime() - time) + " ms";
+        if( name == "" ){
+          gutil.log("Finished subtask after " + magenta(elapsed) );
+        }else{
+          gutil.log("Finished subtask '" + cyan(name) + "' after " + magenta(elapsed) );
+        }
       });
 
       // --- Returen stream.
