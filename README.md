@@ -30,6 +30,9 @@ Create task likes gulp tasks.
 var task = new SubTask()
 	.src( 'test/js/*.js' )
 	.pipe( concat, 'all.js' )
+	.on('end',function(){
+		console.log('Concat ended.');
+	})
 	.pipe( g.dest, 'test/dest/js' );
 
 task.run();
