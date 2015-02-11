@@ -72,7 +72,7 @@ task.run({
 });
 task.run({
 	src    : 'test/js/*.js',
-	concat : 'all_a.js'
+	concat : 'all_b.js'
 });
 ```
 
