@@ -6,8 +6,8 @@
 
     var obj;
     var type = typeof target;
-
-    if( !src || type === 'undefined' || type === 'function' ){
+    
+    if( !src || type === 'undefined' || type === 'function' || target instanceof RegExp ){
       return target;
     }
     

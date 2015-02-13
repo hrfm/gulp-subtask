@@ -2,6 +2,7 @@ var g       = require('gulp');
 var SubTask = require('./index.js')( g );
 var concat  = require('gulp-concat');
 var uglify  = require('gulp-uglify');
+var replace = require('gulp-replace');
 
 // Case1 : Basic usage.
 
@@ -11,7 +12,9 @@ var task1 = new SubTask('task1')
 	.on( 'end',function(){
 		console.log('end task1 concat');
 	})
-	.pipe( g.dest, 'test/dest/js' );
+	.pipe( g.dest, 'test/dest/js' )
+	.pipe( replace, /test/g, 'hoge' )
+	.pipe( g.dest, 'test/dest' );
 
 task1.run();
 
@@ -32,7 +35,9 @@ var task3 = new SubTask('task3')
 	.on( 'end',function(){
 		console.log('end task3 concat');
 	})
-	.pipe( g.dest, 'test/dest/js' );
+	.pipe( g.dest, 'test/dest/js' )
+	.pipe( replace, /test/g, 'hoge' )
+	.pipe( g.dest, 'test/dest' );
 
 task3.run({
 	src    : 'test/js/*.js',
