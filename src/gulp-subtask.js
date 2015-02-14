@@ -9,6 +9,8 @@
       cyan    = gutil.colors.cyan,
       magenta = gutil.colors.magenta;
 
+  var EventEmitter = require('events').EventEmitter;
+
   // ------- LOGGER -----------------------------------------------------------------
 
   var PLUGIN_NAME = "gulp-subtask";
@@ -84,28 +86,28 @@
     }
 
     SubTask.prototype.watch = function( options ){
-      this._watch( this._src, options );
+      return this._watch( this._src, options );
     }
 
     SubTask.prototype.watchWith = function( src, options ){
       if( this._src instanceof Array ){
         if( src instanceof Array ){
-          this._watch( src.concat(this._src), options );
+          return this._watch( src.concat(this._src), options );
         }else if( typeof src === 'string' ){
-          this._watch( [src].concat(this._src), options );
+          return this._watch( [src].concat(this._src), options );
         }
       }else if( typeof this._src === 'string' ){
         if( src instanceof Array ){
           src.push( this._src );
-          this._watch( src, options );
+          return this._watch( src, options );
         }else if( typeof src === 'string' ){
-          this._watch( [this._src,src], options );
+          return this._watch( [this._src,src], options );
         }
       }
     }
 
     SubTask.prototype.watchAs = function( src, options ){
-      this._watch( src, options );
+      return this._watch( src, options );
     }
 
     // ------------------------------------------------------------------------------
@@ -129,8 +131,15 @@
       if( typeof options !== 'undefined' ){
         src = inject( src, options );
       }
+
+      var emitter = new EventEmitter();
+      g.watch( src, function(){
+          self.run(options).on('subtask.complete',function(stream){
+              emitter.emit('complete',stream);
+          });
+      });
       
-      g.watch( src, function(){ self.run(options); });
+      return emitter;
 
     }
 
@@ -204,6 +213,7 @@
         }else{
           gutil.log("Finished subtask '" + cyan(name) + "' after " + magenta(elapsed) );
         }
+        stream.emit('subtask.complete',stream);
       });
 
       // --- Returen stream.
