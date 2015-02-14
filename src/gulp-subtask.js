@@ -138,12 +138,14 @@
 
       var emitter = new EventEmitter();
       g.watch( src, function(){
-        var onComplete  = new SubTask( undefined, true );
-        emitter.emit('complete',onComplete);
-        var stream = self.run(options)
-          .pipe( onComplete.run() );
+        var after = new SubTask( undefined, true );
+        emitter.emit('run',after);
+        var stream = self.run(options);
+        if( 0 < after._pipes.length ){
+          stream.pipe( after.run() );
+        }
       });
-
+      
       return emitter;
 
     }

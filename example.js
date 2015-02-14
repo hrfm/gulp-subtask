@@ -74,6 +74,6 @@ var task5 = new SubTask('task5')
 	})
 
 task5.watch()
-	.on('complete',function(stream){
-		stream.pipe( g.dest, 'test/dest/complete' );
+	.on('run',function(subtask){
+		subtask.pipe( g.dest, 'test/dest/complete' );
 	});
