@@ -26,11 +26,12 @@
     // --- SubTask.
     // ------------------------------------------------------------------------------
 
-    var SubTask = function( taskName ){
-      this._name  = taskName;
-      this._src   = undefined;
-      this._pipes = [];
-      this._on    = {};
+    var SubTask = function( taskName, silentMode ){
+      this._name       = taskName;
+      this._src        = undefined;
+      this._pipes      = [];
+      this._on         = {};
+      this._silentMode = silentMode === true;
     }
 
     // ------------------------------------------------------------------------------
@@ -71,7 +72,7 @@
     }
 
     SubTask.prototype.clone = function(){
-      var clone = new SubTask( this._name );
+      var clone = new SubTask( this._name, this._silentMode );
       clone._src   = this._src;
       clone._pipes = this._pipes;
       return clone;
@@ -132,13 +133,17 @@
         src = inject( src, options );
       }
 
+      // watch tasks 
+      // If after task exists. pipe after run.
+
       var emitter = new EventEmitter();
       g.watch( src, function(){
-          self.run(options).on('subtask.complete',function(stream){
-              emitter.emit('complete',stream);
-          });
+        var onComplete  = new SubTask( undefined, true );
+        emitter.emit('complete',onComplete);
+        var stream = self.run(options)
+          .pipe( onComplete.run() );
       });
-      
+
       return emitter;
 
     }
@@ -147,12 +152,15 @@
 
       var name = (typeof this._name==='string') ? this._name : "",
           time = new Date().getTime(),
+          silentMode = this._silentMode;
           stream;
-
-      if( name == "" ){
-        gutil.log("Starting subtask");
-      }else{
-        gutil.log("Starting subtask '" + cyan(name) + "'");
+      
+      if( silentMode !== true ){
+        if( name == "" ){
+          gutil.log("Starting subtask");
+        }else{
+          gutil.log("Starting subtask '" + cyan(name) + "'");
+        }
       }
 
       // --- Run task.
@@ -208,10 +216,12 @@
 
       stream.on( 'end', function(){
         var elapsed = (new Date().getTime() - time) + " ms";
-        if( name == "" ){
-          gutil.log("Finished subtask after " + magenta(elapsed) );
-        }else{
-          gutil.log("Finished subtask '" + cyan(name) + "' after " + magenta(elapsed) );
+        if( silentMode !== true ){
+          if( name == "" ){
+            gutil.log("Finished subtask after " + magenta(elapsed) );
+          }else{
+            gutil.log("Finished subtask '" + cyan(name) + "' after " + magenta(elapsed) );
+          }
         }
         stream.emit('subtask.complete',stream);
       });

@@ -11,6 +11,15 @@ npm install gulp-subtask
 
 ---
 
+## Release note
+
+### v0.3.0
+
+- [Can piping other task when watched task completed.](#Case6)
+- Bug fix
+
+---
+
 ## Usage
 
 ### At first.
@@ -175,6 +184,17 @@ Call watchAs method.
 
 ```javascript
 task.watchAs( 'another/path/to/*js', options );
+```
+
+### <a name ="Case6">Case6 : Do something after run task by watch().
+
+gulp-subtask can piping other task when watched task completed.
+
+```javascript
+task.watch( options )
+    .on('complete',function(stream){
+		stream.pipe( gulp.dest, '/another/path/to/dest' );
+    })
 ```
 
 

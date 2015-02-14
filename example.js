@@ -73,4 +73,7 @@ var task5 = new SubTask('task5')
 		console.log('end task5 dest');
 	})
 
-task5.watch();
+task5.watch()
+	.on('complete',function(stream){
+		stream.pipe( g.dest, 'test/dest/complete' );
+	});
