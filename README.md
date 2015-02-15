@@ -179,12 +179,12 @@ task.watchAs( 'another/path/to/*js', options );
 
 ### <a name ="Case6">Case6 : Do something after run task by watch().
 
-gulp-subtask can piping other task when watched task completed.
+gulp-subtask can piping other task when watched task run.
 
 ```javascript
 task.watch( options )
-    .on('complete',function(stream){
-		stream.pipe( gulp.dest, '/another/path/to/dest' );
+    .on('run',function(subtask){
+		subtask.pipe( gulp.dest, '/another/path/to/dest' );
     })
 ```
 
