@@ -142,7 +142,7 @@
         emitter.emit('run',after);
         var stream = self.run(options);
         if( 0 < after._pipes.length ){
-          stream.pipe( after.run(options) );
+          stream.pipe( after._pipe( options ) );
         }
       });
 
@@ -150,13 +150,27 @@
 
     }
 
-    SubTask.prototype._run = function( options, src, stream ){
+    SubTask.prototype._run = function( options, src, through2obj ){
 
       var name = (typeof this._name==='string') ? this._name : "",
           time = new Date().getTime(),
-          silentMode = this._silentMode;
+          silentMode = this._silentMode,
           stream;
       
+      // Create stream.
+
+      if( typeof through2obj === 'undefined' ){
+        if( typeof src !== 'undefined' ){
+          stream = g.src( inject( src , options ) );
+        }else if( typeof this._src !== 'undefined' ){
+          stream = g.src( inject( this._src, options ) );
+        }else{
+          throw 'subtask src undefined.';
+        }
+      }else{
+        stream = through2obj;
+      }
+
       if( silentMode !== true ){
         if( name == "" ){
           gutil.log("Starting subtask");
@@ -166,10 +180,6 @@
       }
 
       // --- Run task.
-
-      if( typeof stream === "undefined" ){
-        stream = g.src( inject( src || this._src, options ) );
-      }
 
       if( typeof options === 'undefined' ){
         
@@ -225,7 +235,6 @@
             gutil.log("Finished subtask '" + cyan(name) + "' after " + magenta(elapsed) );
           }
         }
-        stream.emit('subtask.complete',stream);
       });
 
       // --- Returen stream.
@@ -240,19 +249,46 @@
      */
     SubTask.prototype._pipe = function( options ){
 
-      var obj = th2.obj(
+      var start = th2.obj(
         // --- Get src from recent pipe.
         function( f, enc, callback ){
-          if(f.isNull()  ){ return callback(); }
-          if(f.isStream()){ return this.emit('error',new PluginError('gulp-subtask','Streaming not supported')); }
+          if( f.isNull()   ){ return callback(); }
+          if( f.isStream() ){ return this.emit('error',new PluginError('gulp-subtask','Streaming not supported')); }
           this.push(f);
           callback();
         }
       );
+
+      var obj = th2.obj(
+        // --- Get src from recent pipe.
+        function( f, enc, callback ){
+          if( f.isNull()   ){ return callback(); }
+          if( f.isStream() ){ return this.emit('error',new PluginError('gulp-subtask','Streaming not supported')); }
+          start.push(f);
+          callback();
+        },
+        function(){
+          start.emit('end');
+        }
+      );
       
-      return this.clone()
-          ._run( options, null, obj );
-            
+      var end = th2.obj(
+        // --- Get src from recent pipe.
+        function( f, enc, callback ){
+          if( f.isNull()   ){ return callback(); }
+          if( f.isStream() ){ return this.emit('error',new PluginError('gulp-subtask','Streaming not supported')); }
+          obj.push(f);
+          callback();
+        },
+        function(){
+          obj.emit('end');
+        }
+      );
+
+      this.clone()._run( options, null, start ).pipe( end );
+
+      return obj;
+
     }
 
     return SubTask;

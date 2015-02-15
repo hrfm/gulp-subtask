@@ -3,6 +3,7 @@ var SubTask = require('./index.js')( g );
 var concat  = require('gulp-concat');
 var uglify  = require('gulp-uglify');
 var replace = require('gulp-replace');
+var plumber = require('gulp-plumber');
 
 // Case1 : Basic usage.
 
@@ -22,9 +23,27 @@ task1.run();
 
 var task2 = new SubTask('task2')
 	.src( 'test/js/*.js' )
-	.pipe( concat, 'ab.case2.js' );
+	.pipe( concat, 'ab.case2.js' )
+	.on('end',function(){
+		console.log('task2 concat end.');
+	});
+
+var task2_2 = new SubTask('task2_2')
+	.pipe( replace, /test/g, 'case2' )
+	.on('end',function(){
+		console.log('task2_2 replace end.');
+	})
+	.pipe( uglify )
+	.on('end',function(){
+		console.log('task2_2 uglify end.');
+	})
+	.pipe( g.dest, 'test/dest/case2' )
+	.on('end',function(){
+		console.log('task2_2 dest end.');
+	})
 
 task2.run()
+	.pipe( task2_2.run() )
 	.pipe( g.dest('test/dest/js') );
 
 // Case3 : Task with options.
@@ -51,10 +70,30 @@ task3.run({
 // Case4 : Using between pipes
 
 var task4 = new SubTask('task4')
-	.pipe( concat, 'ab.case4.js' );
+	.pipe( uglify )
+	.on('end',function(){
+		console.log('task4 uglify end.');
+	})
+	.pipe( g.dest, 'test/dest/case4' )
+	.on('end',function(){
+		console.log('task4 dest end.');
+	});
+
+var task4_2 = new SubTask('task4_2')
+	.pipe( replace, /test/g, 'hoge' )
+	.on('end',function(){
+		console.log('task4_2 replace end.');
+	})
+	.pipe( g.dest, 'test/dest/case4' )
+	.on('end',function(){
+		console.log('task4_2 dest end.');
+	});
 
 g.src( 'test/js/*.js' )
+ .pipe( plumber() )
+ .pipe( concat( 'ab.case4.js' ) )
  .pipe( task4.run() )
+ .pipe( task4_2.run() )
  .pipe( g.dest('test/dest/js') );
 
 // Case5 : Watch.
@@ -75,5 +114,13 @@ var task5 = new SubTask('task5')
 
 task5.watch()
 	.on('run',function(subtask){
-		subtask.pipe( g.dest, 'test/dest/complete' );
+		subtask
+			.pipe( uglify )
+			.on('end',function(){
+				console.log('end task5 uglify with watch');
+			})
+			.pipe( g.dest, 'test/dest/complete' )
+			.on('end',function(){
+				console.log('end task5 dest with watch');
+			});
 	});
