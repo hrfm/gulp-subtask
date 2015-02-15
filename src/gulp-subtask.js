@@ -142,10 +142,10 @@
         emitter.emit('run',after);
         var stream = self.run(options);
         if( 0 < after._pipes.length ){
-          stream.pipe( after.run() );
+          stream.pipe( after.run(options) );
         }
       });
-      
+
       return emitter;
 
     }
