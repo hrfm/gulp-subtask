@@ -11,15 +11,6 @@ npm install gulp-subtask
 
 ---
 
-## Release note
-
-### v0.3.0
-
-- [Can piping other task when watched task completed.](#Case6)
-- Bug fix
-
----
-
 ## Usage
 
 ### At first.
