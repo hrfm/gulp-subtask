@@ -4,6 +4,7 @@ var concat  = require('gulp-concat');
 var uglify  = require('gulp-uglify');
 var replace = require('gulp-replace');
 var plumber = require('gulp-plumber');
+var debug   = require('gulp-debug');
 
 // Case1 : Basic usage.
 
@@ -22,16 +23,18 @@ task1.run();
 // Case2 : pipe after sub task
 
 var task2 = new SubTask('task2')
-	.src( 'test/js/*.js' )
-	.pipe( concat, 'ab.case2.js' )
+	.src( 'test/js/**/*.js' )
+	.pipe( replace, /test/g, 'case2' )
+	.pipe( debug, {title: 'task2', minimal: false} )
 	.on('end',function(){
-		console.log('task2 concat end.');
+		console.log('task2 debug end.');
 	});
 
 var task2_2 = new SubTask('task2_2')
-	.pipe( replace, /test/g, 'case2' )
+	.pipe( debug, {title: 'task2', minimal: false} )
+	.pipe( concat, 'ab.case2.js' )
 	.on('end',function(){
-		console.log('task2_2 replace end.');
+		console.log('task2_2 concat end.');
 	})
 	.pipe( uglify )
 	.on('end',function(){
