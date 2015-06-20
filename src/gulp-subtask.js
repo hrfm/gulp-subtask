@@ -195,16 +195,18 @@
           
           if( this._pipes[i].target == 'pipe' ){
             var args = this._pipes[i].args;
+            stream = stream.pipe( args[0].apply( null, args.slice(1,args.length) ) );
+            if( this._pipes[i+1] && this._pipes[i+1].target == "done" ){
+              var tmp = this._pipes[i+1].callback( stream );
+              if( tmp ){ stream = tmp; }
+            }
             //if( typeof args[0] === 'function' ){
-              stream = stream.pipe( args[0].apply( null, args.slice(1,args.length) ) );
+            //  stream = stream.pipe( args[0].apply( null, args.slice(1,args.length) ) );
             //}else{
             //  stream = stream.pipe.apply( stream, args );
             //}
           }else if( this._pipes[i].target == 'on' ){
             stream = stream.on( this._pipes[i].type, this._pipes[i].callback );
-          }else if( this._pipes[i].target == 'done' ){
-            this._pipes[i].callback(stream.pipe( args[0].apply( null, args.slice(1,args.length) ));
-            break;
           }
 
         }
@@ -221,12 +223,10 @@
               for( var j=1; j<args.length; j++ ){
                 applyArgs.push( inject( args[j], options ) );
               }
-
-              if( this._pipes[i].target == 'pipe' ){
-                stream = stream.pipe( args[0].apply( null, applyArgs ) );
-              }else{
-                this._pipes[i].callback( stream.pipe( args[0].apply( null, applyArgs ) ) );
-                break;
+              stream = stream.pipe( args[0].apply( null, applyArgs ) );
+              if( this._pipes[i+1] && this._pipes[i+1].target == "done" ){
+                var tmp = this._pipes[i+1].callback( stream );
+                if( tmp ){ stream = tmp; }
               }
             //}else{
             //  for( var j=0; j<args.length; j++ ){
