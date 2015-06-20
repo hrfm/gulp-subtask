@@ -194,19 +194,27 @@
         for( var i=0, len=this._pipes.length; i < len; i++ ){
           
           if( this._pipes[i].target == 'pipe' ){
+            
             var args = this._pipes[i].args;
+            
             stream = stream.pipe( args[0].apply( null, args.slice(1,args.length) ) );
+
+            // --- If set done task after pipe. Call done callback function with stream and options.
             if( this._pipes[i+1] && this._pipes[i+1].target == "done" ){
-              var tmp = this._pipes[i+1].callback( stream );
+              var tmp = this._pipes[i+1].callback( stream, options );
               if( tmp ){ stream = tmp; }
             }
+
             //if( typeof args[0] === 'function' ){
             //  stream = stream.pipe( args[0].apply( null, args.slice(1,args.length) ) );
             //}else{
             //  stream = stream.pipe.apply( stream, args );
             //}
+
           }else if( this._pipes[i].target == 'on' ){
+
             stream = stream.on( this._pipes[i].type, this._pipes[i].callback );
+
           }
 
         }
@@ -220,14 +228,19 @@
             var args = this._pipes[i].args, applyArgs = [];
 
             //if( typeof args[0] === 'function' ){
+              
               for( var j=1; j<args.length; j++ ){
                 applyArgs.push( inject( args[j], options ) );
               }
+
               stream = stream.pipe( args[0].apply( null, applyArgs ) );
+
+              // --- If set done task after pipe. Call done callback function with stream and options.
               if( this._pipes[i+1] && this._pipes[i+1].target == "done" ){
-                var tmp = this._pipes[i+1].callback( stream );
+                var tmp = this._pipes[i+1].callback( stream, options );
                 if( tmp ){ stream = tmp; }
               }
+              
             //}else{
             //  for( var j=0; j<args.length; j++ ){
             //    applyArgs.push( inject( args[j], options ) );
