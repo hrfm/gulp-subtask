@@ -3,8 +3,6 @@ gulp-subtask
 
 ## Getting started
 
-You can install this module from npm.
-
 ```sh
 npm install gulp-subtask
 ```
@@ -12,6 +10,14 @@ npm install gulp-subtask
 ---
 
 ## Usage
+
+- [Case1 : Basic usage.](#Case1)
+- [Case2 : pipe after sub task](#Case2)
+- [Case3 : Run with options.](#Case3)
+- [Case4 : Using between gulp pipes.](#Case4)
+- [Case5 : Watch the task.](#Case5)
+- [Case6 : Do something after run task by watch().](#Case6)
+- [Case7 : Using with non stream return plugins.](#Case7)
 
 ### At first.
 
@@ -22,7 +28,7 @@ var g       = require('gulp');
 var SubTask = require('gulp-subtask')( g );
 ```
 
-### Case1 : Basic usage.
+### <a name ="Case1">Case1 : Basic usage.
 
 Create task likes gulp tasks.
 
@@ -38,10 +44,9 @@ var task = new SubTask()
 task.run();
 ```
 
-### Case2 : pipe after sub task
+### <a name ="Case2">Case2 : pipe after sub task
 
 gulp-subtask returns pipe stream.
-You can continue task use pipe() afret run().
 
 ```javascript
 var task = new SubTask('task')
@@ -52,13 +57,9 @@ task.run()
 	.pipe( g.dest('test/dest/js') );
 ```
 
-### Case3 : Run with options.
-
-gulp-subtask is able to run with using option.
+### <a name ="Case3">Case3 : Run with options.
 
 For example. If you want to change flexibly input src, output, and more.
-
-You can do it like below.
 
 ```javascript
 var task = new SubTask('task')
@@ -117,7 +118,7 @@ tsc.run();
 If you would like to know replace rules.  
 Check out the [Replace Rules](#ReplaceRules) term.
 
-### Case4 : Using between gulp pipes.
+### <a name ="Case4">Case4 : Using between gulp pipes.
 
 gulp-subtask is be able to using between gulp pipes.
 In that case. You have to make a task without src method.
@@ -143,7 +144,7 @@ g.src( 'test/js/*.js' )
  .pipe( g.dest('test/dest/js') );
 ```
 
-### Case5 : Watch the task.
+### <a name ="Case5">Case5 : Watch the task.
 
 If you want to watch subTask.src and run.
 Simply call watch.
@@ -186,6 +187,47 @@ task.watch( options )
     .on('run',function(subtask){
 		subtask.pipe( gulp.dest, '/another/path/to/dest' );
     })
+```
+
+### <a name ="Case7">Case 7 : Using with non stream return plugins.
+
+For exsample gulp-typescript pipes not return stream.
+
+```js
+gulp.src("*.ts")
+	.pipe(typescript())
+	.js
+	.pipe( gulp.dest("outDir") );
+```
+
+In that case. Use done method.
+
+```js
+var task = new SubTask()
+	.src( "" )
+	.pipe( typescript )
+	.done(
+		function(result,options){
+			// This return used after pipe.
+			return result.js
+		}
+	)
+	.pipe( g.dest, 'test/dest/js' );
+
+tast.run();
+```
+
+```js
+var task = new SubTask()
+	.src( "{{srcDir}}/*.ts" )
+	.pipe( typescript )
+	.done(
+		function(result,options){
+			return result.js.pipe(g.dest(options.srcDir))
+		}
+	);
+
+task.run({srcDir:"path/to/src"});
 ```
 
 ---
@@ -382,50 +424,4 @@ Key-Value Object.
 
 ## Update history
 
-- 0.3.3
-
-    Add done method.
-
-If you would like to use non stream return plugin.  
-done method is useful.
-
-For exsample gulp-typescript pipes.
-
-```js
-gulp.src("*.ts")
-	.pipe(typescript())
-	.js
-	.pipe( gulp.dest("outDir") );
-```
-
-That is same below.
-
-```js
-var task = new SubTask()
-	.src( "" )
-	.pipe( typescript )
-	.done(
-		function(result){
-			// This return used after pipe.
-			return result.js
-		}
-	)
-	.pipe( g.dest, 'test/dest/js' );
-
-tast.run();
-```
-
-If you want to use options with done method.
-
-```js
-var task = new SubTask()
-	.src( "{{srcDir}}/*.ts" )
-	.pipe( typescript )
-	.done(
-		function(result,iptions){
-			return result.js.pipe(g.dest(options.srcDir))
-		}
-	);
-
-task.run({srcDir:"path/to/src"});
-```
+    0.3.3 Add done method.
