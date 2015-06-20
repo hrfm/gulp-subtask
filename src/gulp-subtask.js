@@ -71,6 +71,14 @@
       return this;
     }
 
+    SubTask.prototype.done = function( callback ){
+      this._pipes.push({
+        'target'   : 'done',
+        'callback' : callback
+      });
+      return this;
+    }
+
     SubTask.prototype.clone = function(){
       var clone = new SubTask( this._name, this._silentMode );
       clone._src   = this._src;
@@ -194,6 +202,9 @@
             //}
           }else if( this._pipes[i].target == 'on' ){
             stream = stream.on( this._pipes[i].type, this._pipes[i].callback );
+          }else if( this._pipes[i].target == 'done' ){
+            this._pipes[i].callback(stream.pipe( args[0].apply( null, args.slice(1,args.length) ));
+            break;
           }
 
         }
@@ -202,7 +213,7 @@
 
         for( var i=0, len=this._pipes.length; i < len; i++ ){
 
-          if( this._pipes[i].target == 'pipe' ){
+          if( this._pipes[i].target == 'pipe' || this._pipes[i].target == 'done' ){
 
             var args = this._pipes[i].args, applyArgs = [];
 
@@ -210,7 +221,13 @@
               for( var j=1; j<args.length; j++ ){
                 applyArgs.push( inject( args[j], options ) );
               }
-              stream = stream.pipe( args[0].apply( null, applyArgs ) );
+
+              if( this._pipes[i].target == 'pipe' ){
+                stream = stream.pipe( args[0].apply( null, applyArgs ) );
+              }else{
+                this._pipes[i].callback( stream.pipe( args[0].apply( null, applyArgs ) ) );
+                break;
+              }
             //}else{
             //  for( var j=0; j<args.length; j++ ){
             //    applyArgs.push( inject( args[j], options ) );
