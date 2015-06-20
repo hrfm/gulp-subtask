@@ -188,7 +188,6 @@ task.watch( options )
     })
 ```
 
-
 ---
 
 ## <a name ="ReplaceRules">Replace Rules
@@ -329,6 +328,22 @@ Don't call. Set function's reference only.
 #### ...args
 Type: `Any`
 
+### SubTask.run( fnc );
+
+example
+
+```javescript
+task.pipe( gulp_typescript )
+	.done(function(result){
+		result.js.pipe( gulp.dest("out") );
+	});
+```
+
+#### fnc
+Type: `Function`
+
+Call with before pipes result.
+
 ### SubTask.run( options );
 
 example
@@ -363,28 +378,54 @@ Key-Value Object.
 
 ---
 
-LICENSE
--------
+---
 
-(MIT License)
+## Update history
 
-Copyright (c) 2015 [ Hirofumi Kawakita ] https://github.com/hrfm
+- 0.3.3
 
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
+    Add done method.
 
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
+If you would like to use non stream return plugin.  
+done method is useful.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+For exsample gulp-typescript pipes.
+
+```js
+gulp.src("*.ts")
+	.pipe(typescript())
+	.js
+	.pipe( gulp.dest("outDir") );
+```
+
+That is same below.
+
+```js
+var task = new SubTask()
+	.src( "" )
+	.pipe( typescript )
+	.done(
+		function(result){
+			// This return used after pipe.
+			return result.js
+		}
+	)
+	.pipe( g.dest, 'test/dest/js' );
+
+tast.run();
+```
+
+If you want to use options with done method.
+
+```js
+var task = new SubTask()
+	.src( "{{srcDir}}/*.ts" )
+	.pipe( typescript )
+	.done(
+		function(result,iptions){
+			return result.js.pipe(g.dest(options.srcDir))
+		}
+	);
+
+task.run({srcDir:"path/to/src"});
+```
