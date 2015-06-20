@@ -215,7 +215,7 @@
 
         for( var i=0, len=this._pipes.length; i < len; i++ ){
 
-          if( this._pipes[i].target == 'pipe' || this._pipes[i].target == 'done' ){
+          if( this._pipes[i].target == 'pipe' ){
 
             var args = this._pipes[i].args, applyArgs = [];
 
