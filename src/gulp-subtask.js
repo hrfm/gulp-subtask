@@ -147,8 +147,11 @@
       var emitter = new EventEmitter();
       g.watch( src, function(){
         var after = new SubTask( undefined, true );
-        emitter.emit('run',after);
+        emitter.emit('beforerun',after);
         var stream = self.run(options);
+        stream.on("end",function(){
+          emitter.emit('run',after);
+        });
         if( 0 < after._pipes.length ){
           stream.pipe( after._pipe( options ) );
         }
