@@ -184,8 +184,8 @@ gulp-subtask can piping other task when watched task run.
 
 ```javascript
 task.watch( options )
-    .on('run',function(subtask){
-		subtask.pipe( gulp.dest, '/another/path/to/dest' );
+    .on('run',function(stream){
+		stream.pipe( gulp.dest('/another/path/to/dest') );
     })
 ```
 
